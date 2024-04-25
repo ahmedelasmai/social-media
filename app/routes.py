@@ -1,6 +1,7 @@
 from flask import render_template, flash, redirect, url_for, request
 from app import app
-profiles = 'james'
+from app.reels import links
+profiles = 'james'   #  FOR TESTING
 
 @app.route('/')
 @app.route('/index', methods = ['GET', 'POST'])
@@ -16,5 +17,31 @@ def index():
 
 @app.route('/profile')
 def profile():
+    return render_template('profile.html', profiles=profiles)
 
-    return render_template('profile.html',profiles=profiles)
+@app.route('/reels')
+def reels():
+    return render_template('reels.html',links=links)
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
