@@ -7,8 +7,21 @@
 </head>
 <body>
     <video width="640" height="360" controls autoplay>
-        <source src= "{{ links[0] }}" type="video/mp4">
+        <source src= "{{ reel }}" type="video/mp4">
         Your browser does not support the video tag.
     </video>
 </body>
+
+<body>
+    <form action="/reels" method="post">
+        <input type="hidden" name="back">
+        <button type="submit">Back</button>
+    </form>
+
+    <form action="/reels" method="post">
+        <input type="hidden" name="next">
+        <button type="submit">Next</button>
+    </form>
+</body>
+
 </html>
