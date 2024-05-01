@@ -3,21 +3,21 @@ from app import app
 from app.reels import Reels
 
 profiles = 'james'   #  FOR TESTIN
-video_index = 0
-
+search = 'sea'
 reel = Reels()
+reel.search(search)
 
 @app.route('/')      
 @app.route('/index', methods = ['GET', 'POST'])
 def index():
-    global search
     if request.method == 'POST':
         search = request.form['search']
+        reel.search(search)
         if search[0] == '@':
             search = search[1:]
-        if profiles == search:
-            return redirect(url_for('profile')) 
-        
+            if profiles == search:                          
+                return redirect(url_for('profile')) 
+         
         return redirect(url_for('reels'))    
     return render_template('index.html')
 
@@ -27,21 +27,20 @@ def profile():
 
 @app.route('/reels', methods = ['GET', 'POST'])
 def reels():
-    links = reel.get_video(search)
-    global video_index
 
-    if request.method == 'POST':    
-        if 'next' in request.form and video_index < len(links):
-            video_index += 1
-            link = links[video_index]
-            return render_template('reels.html', reel=link)
+    if request.method == 'POST':  
+        print('requestform', request.form)          
+        if 'next' in request.form:
+            link, video_index, page = reel.change('next')
+            return render_template('reels.html', link=link,video_index=video_index,page=page)
         
-        if 'back' in request.form and video_index > 1:
-            video_index -= 1
-            link = links[video_index]
-            return render_template('reels.html', reel=link)
-    link = links[0]
-    return render_template('reels.html', reel=link)
+        elif 'back' in request.form:
+            link, video_index, page = reel.change('back')
+            return render_template('reels.html', link=link,video_index=video_index,page=page)
+        
+    else:
+        link, video_index, page = reel.change('none')
+        return render_template('reels.html',link=link,video_index=video_index,page=page)
 
 
 
