@@ -1,7 +1,7 @@
 import requests  
 
 
-class Reels:
+class Videos:
 
     def __init__(self):
         self.index = 0
@@ -9,7 +9,6 @@ class Reels:
     
     def search(self, search):
         self.search = search
-        print(search)
     def change(self, move='none'):
         links = self.get_video()
         if move == 'next':
@@ -18,12 +17,10 @@ class Reels:
                 self.index = 0
                 self.page += 1
                 links = self.get_video()
-                print('next page')
                 return links[self.index], self.index, self.page
             #next video
             else:
                 self.index += 1
-                print('next vid:', self.index)
                 return links[self.index], self.index, self.page
 
         elif move == 'back':
@@ -32,21 +29,17 @@ class Reels:
                 self.index = 14
                 self.page -= 1
                 links = self.get_video()
-                print('back')
                 return links[self.index], self.index, self.page
             #previous video
             elif self.index > 0:
                 self.index -= 1
-                print('prev vid', self.index)
                 return links[self.index], self.index, self.page
             
             else:
-                print('back when 0')
                 return links[self.index], self.index, self.page
 
         #when at first video
         else:
-            print('first vid',self.index)
             return links[self.index], self.index, self.page
             
 
