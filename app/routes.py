@@ -1,29 +1,37 @@
 from flask import render_template, redirect, url_for, request
 from app import app
 from app.videos import Videos
+from app.db import Db
 
-profiles = 'james'   #  FOR TESTIN
-search = 'sea'       #
 video = Videos()
-video.search(search)  #
+db = Db()
 
 @app.route('/')      
 @app.route('/index', methods = ['GET', 'POST'])
 def index():
     if request.method == 'POST':
         search = request.form['search']
-        video.search(search)
         if search[0] == '@':
-            search = search[1:]
-            if profiles == search:                          
+            print('searching for user')
+            profiles = db.user_exists(search)
+            print(profiles)
+            if profiles:                          
                 return redirect(url_for('profile')) 
-         
+        print('/n searching for video')        
+        video.search(search)
         return redirect(url_for('videos'))    
     return render_template('index.html')
 
 @app.route('/profile')
 def profile():
-    return render_template('profile.html', profiles=profiles)
+    user_info,followers, following, posts, post_count = db.load_profile()
+    username, name , bio = user_info[:3]
+
+            #how to display posts 
+    
+    return render_template('profile.html',username=username,name=name
+                           ,bio=bio, followers=followers,following=following,posts=posts,
+                           post_count=post_count)
 
 @app.route('/video', methods = ['GET', 'POST'])
 def videos():

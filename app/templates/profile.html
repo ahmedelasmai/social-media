@@ -3,9 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ profiles }}'s profile</title>
+    <title>Social Media App</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>Hello {{ profiles }}</h1>
+<div>
+<img src="{{ url_for('static', filename='img/pfp_' + username + '.png' )}}">
+<p>{{ username }}   {{ name }}</p>
+<p>message   add</p>
+<p><b>{{ post_count }}</b> posts  <b>{{ followers }}</b> followers  <b>{{ following }}</b> following</p>
+<p>{{ bio }}</p>
+
+
+
+</div>
+
+    <div class="post-container">
+        {% for post in posts %}
+            <div class="post">
+            {% if post[2] == 1 %}
+                <img src="{{ url_for('static', filename='img/post_' + post[0] | string + '.png') }}">
+            {% endif %}  
+                
+                <p>asdf </p>
+            </div>
+            {% if loop.index % 3 == 0 %}
+                </div><div class="post-container">
+            {% endif %}
+        {% endfor %}
+    </div>
 </body>
 </html>
