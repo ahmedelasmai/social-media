@@ -2,6 +2,19 @@ import sqlite3
 
 class Db:
 
+    def __init__(self):            #debug     
+        self.username = '@user1'   #
+        self.user = '@user1' 
+    #                                     DEBUG
+    def loggedin(self):
+        self.user = '@user1' 
+
+    def follow(self, target_user):
+        with sqlite3.connect('social media.db') as conn:
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO following (username,following) VALUES (?,?)", (self.user, target_user))
+            conn.commit()
+
     def load_profile(self):
         with sqlite3.connect('social media.db') as conn:
             cursor = conn.cursor()
@@ -11,7 +24,8 @@ class Db:
             followers = cursor.fetchall()
             cursor.execute("SELECT COUNT(Following) FROM Following WHERE username=?", (self.username,))
             follows = cursor.fetchall()
-            cursor.execute("SELECT PostID, Content, Image, Timestamp FROM Post WHERE Username=? ORDER BY Timestamp ASC", (self.username,))
+            cursor.execute("SELECT PostID, Content, Image, Timestamp FROM Post WHERE Username=? ORDER BY Timestamp ASC",
+                            (self.username,))
             posts = cursor.fetchall() #tupil
             post_count = len(posts)
 
@@ -25,18 +39,36 @@ class Db:
         return user_info[:3], followers[0][0], follows[0][0], posts, post_count
     
     def get_followers(self): 
+        mutual = []
         with sqlite3.connect('social media.db') as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT followers FROM followers WHERE username=?", (self.username,))
             followers = cursor.fetchall()
-            return followers
-    
+            cursor.execute("SELECT following FROM following WHERE username=?", (self.user,))
+            user_followers = cursor.fetchall()
+
+        #check for mutual followers
+        for follower in followers:
+            if follower in user_followers:
+                mutual.append(follower)
+
+        return followers, mutual
+
     def get_following(self):
+        mutual = []
         with sqlite3.connect('social media.db') as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT following FROM following WHERE username=?", (self.username,))
             following = cursor.fetchall()
-            return following
+            cursor.execute("SELECT following FROM following WHERE username=?", (self.user,))
+            user_followers = cursor.fetchall()
+
+        #check for mutual following
+        for follower in following:
+            if follower in user_followers:
+                mutual.append(follower)
+
+        return following, mutual
     
      #test this
     def post_info(self, postId): 
