@@ -33,6 +33,16 @@ def profile():
                            ,bio=bio, followers=followers,following=following,posts=posts,
                            post_count=post_count)
 
+@app.route('/followers')
+def followers():
+    followers_list = db.get_followers()
+    return render_template('followers.html',followers_list=followers_list)
+
+@app.route('/following')
+def following():
+    following_list = db.get_following()
+    return render_template('following.html',following_list=following_list)
+
 @app.route('/video', methods = ['GET', 'POST'])
 def videos():
 

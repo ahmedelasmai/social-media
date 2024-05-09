@@ -7,9 +7,9 @@ class Db:
             cursor = conn.cursor()
             cursor.execute("SELECT Username, Name, Bio FROM User WHERE Username=?", (self.username,))
             user_info = cursor.fetchone()  #tuple
-            cursor.execute("SELECT COUNT(Follower) FROM Followers WHERE Following=?", (self.username,))
+            cursor.execute("SELECT COUNT(Followers) FROM Followers WHERE username=?", (self.username,))
             followers = cursor.fetchall()
-            cursor.execute("SELECT COUNT(FollowingUsername) FROM Follows WHERE FollowerUsername=?", (self.username,))
+            cursor.execute("SELECT COUNT(Following) FROM Following WHERE username=?", (self.username,))
             follows = cursor.fetchall()
             cursor.execute("SELECT PostID, Content, Image, Timestamp FROM Post WHERE Username=? ORDER BY Timestamp ASC", (self.username,))
             posts = cursor.fetchall() #tupil
@@ -25,10 +25,18 @@ class Db:
         return user_info[:3], followers[0][0], follows[0][0], posts, post_count
     
     def get_followers(self): 
-        pass
+        with sqlite3.connect('social media.db') as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT followers FROM followers WHERE username=?", (self.username,))
+            followers = cursor.fetchall()
+            return followers
     
-    def get_follows(self):
-        pass
+    def get_following(self):
+        with sqlite3.connect('social media.db') as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT following FROM following WHERE username=?", (self.username,))
+            following = cursor.fetchall()
+            return following
     
      #test this
     def post_info(self, postId): 
@@ -63,11 +71,8 @@ class Db:
 
 # db = Db()
 # db.user_exists('@user1')
-# user_info,followers, following, posts, post_count = db.load_profile()
-# print(posts[0][0])
+# followers = db.get_followers()
+# print(followers)
 
-#(('@user1', 'User One', 'Bio for User One'), 2, 2, 
+#[('@user2',), ('@user3',)]
 
-#[('First post content', 1, '2024-05-04 12:15:01'), ('Second post content', 1, '2024-05-04 12:15:01'),
-# ('Third post content', 0, '2024-05-04 12:15:01')],
-# 3)
