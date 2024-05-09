@@ -7,31 +7,35 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-<div>
-<img src="{{ url_for('static', filename='img/pfp_' + username + '.png' )}}">
-<p>{{ username }} </p> 
-<p>{{ name }}</p>
-<p>message   add</p>
-<p><b>{{ post_count }}</b> posts  <b>{{ followers }}</b> followers  <b>{{ following }}</b> following</p>
-<p>{{ bio }}</p>
-
-
-
+<div class="profile-container">
+    <div class="profile-picture">
+        <img src="{{ url_for('static', filename='img/pfp_' + username + '.png' )}}"  alt="profile picture">
+    </div>
+    <div class="profile-info">
+        <p>{{ username }}</p>
+        <p>{{ name }}</p>
+        <p>message   add</p>
+        <p><b>{{ post_count }}</b> posts  <b>{{ followers }}</b> followers  <b>{{ following }}</b> following</p>
+        <p>{{ bio }}</p>
+    </div>
 </div>
 
-    <div class="post-container">
-        {% for post in posts %}
-            <div class="post">
+<div class="post-container">
+    {% for post in posts %}
+    <div class="post">
+        <div class="post-image">
             {% if post[2] == 1 %}
-                <img src="{{ url_for('static', filename='img/post_' + post[0] | string + '.png') }}">
-            {% endif %}  
-                
-                <p>asdf </p>
-            </div>
-            {% if loop.index % 3 == 0 %}
-                </div><div class="post-container">
+            <img src="{{ url_for('static', filename='img/post_' + post[0] | string + '.png') }}">
             {% endif %}
-        {% endfor %}
+        </div>
+        <div class="post-text">
+            <p>{{ post[1] }}</p>
+        </div>
     </div>
+    {% if loop.index % 3 == 0 %}
+    </div><div class="post-container">
+    {% endif %}
+    {% endfor %}
+</div>
 </body>
 </html>
