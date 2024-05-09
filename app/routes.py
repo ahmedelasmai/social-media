@@ -12,12 +12,11 @@ def index():
     if request.method == 'POST':
         search = request.form['search']
         if search[0] == '@':
-            print('searching for user')
             profiles = db.user_exists(search)
-            print(profiles)
             if profiles:                          
                 return redirect(url_for('profile')) 
-        print('/n searching for video')        
+            else:
+                return redirect(url_for('index'))
         video.search(search)
         return redirect(url_for('videos'))    
     return render_template('index.html')
@@ -35,13 +34,13 @@ def profile():
 
 @app.route('/followers')
 def followers():
-    followers_list = db.get_followers()
-    return render_template('followers.html',followers_list=followers_list)
+    followers_list, mutual = db.get_followers()
+    return render_template('followers.html',followers_list=followers_list, mutual=mutual)
 
 @app.route('/following')
 def following():
-    following_list = db.get_following()
-    return render_template('following.html',following_list=following_list)
+    following_list, mutual = db.get_following()
+    return render_template('following.html',following_list=following_list,mutual=mutual)
 
 @app.route('/video', methods = ['GET', 'POST'])
 def videos():

@@ -4,7 +4,11 @@
 <h1>Following</h1>
 
 {% for following in following_list %}
-<p> {{ following[0] }}  -  add </p>
+    {% if following in mutual %}
+        <p> {{ following[0] }}  -  mutual</p>
+    {% else %}
+        <p> {{ following[0] }}  -  add </p>
+    {% endif %}
 {% endfor %}
 
 
