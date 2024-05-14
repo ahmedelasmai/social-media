@@ -5,9 +5,12 @@
 
 {% for following in following_list %}
     {% if following in mutual %}
-        <p> {{ following[0] }}  -  mutual</p>
+        <p> {{ following[0] }}    following</p>
     {% else %}
-        <p> {{ following[0] }}  -  add </p>
+    <form action="/following" method="post">
+        <p style="display: inline-block;"> {{ following[0] }}</p>
+        <button type="submit" name="button" value="{{ following[0] }}">follow</button>
+    </form>
     {% endif %}
 {% endfor %}
 

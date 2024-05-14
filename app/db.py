@@ -5,14 +5,29 @@ class Db:
     def __init__(self):            #debug     
         self.username = '@user1'   #
         self.user = '@user1' 
+        
     #                                     DEBUG
     def loggedin(self):
         self.user = '@user1' 
+    
+    def user_already_following(self,follows_list):
+        mutual = []
+
+        with sqlite3.connect('social media.db') as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT target FROM follows WHERE stalker=?", (self.user,))
+            user_followers = cursor.fetchall()
+        
+        for follower in follows_list:
+            if follower in user_followers:
+                mutual.append(follower)
+
+        return mutual
 
     def follow(self, target_user):
         with sqlite3.connect('social media.db') as conn:
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO following (username,following) VALUES (?,?)", (self.user, target_user))
+            cursor.execute("INSERT INTO follows (stalker,target) VALUES (?,?)", (self.user, target_user))
             conn.commit()
 
     def load_profile(self):
@@ -20,15 +35,15 @@ class Db:
             cursor = conn.cursor()
             cursor.execute("SELECT Username, Name, Bio FROM User WHERE Username=?", (self.username,))
             user_info = cursor.fetchone()  #tuple
-            cursor.execute("SELECT COUNT(Followers) FROM Followers WHERE username=?", (self.username,))
+            cursor.execute("SELECT COUNT(stalker) FROM Follows WHERE target=?", (self.username,))
             followers = cursor.fetchall()
-            cursor.execute("SELECT COUNT(Following) FROM Following WHERE username=?", (self.username,))
+            cursor.execute("SELECT COUNT(target) FROM Follows WHERE stalker=?", (self.username,))
             follows = cursor.fetchall()
             cursor.execute("SELECT PostID, Content, Image, Timestamp FROM Post WHERE Username=? ORDER BY Timestamp ASC",
                             (self.username,))
             posts = cursor.fetchall() #tupil
             post_count = len(posts)
-
+                                                                                                                                
             #removes seconds from timestamp
             for i in range(len(posts)):
                 post = list(posts[i])
@@ -39,34 +54,23 @@ class Db:
         return user_info[:3], followers[0][0], follows[0][0], posts, post_count
     
     def get_followers(self): 
-        mutual = []
         with sqlite3.connect('social media.db') as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT followers FROM followers WHERE username=?", (self.username,))
+            cursor.execute("SELECT stalker FROM follows WHERE target=?", (self.username,))
             followers = cursor.fetchall()
-            cursor.execute("SELECT following FROM following WHERE username=?", (self.user,))
-            user_followers = cursor.fetchall()
-
-        #check for mutual followers
-        for follower in followers:
-            if follower in user_followers:
-                mutual.append(follower)
-
+    
+        mutual = self.user_already_following(followers) 
+        
         return followers, mutual
 
     def get_following(self):
         mutual = []
         with sqlite3.connect('social media.db') as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT following FROM following WHERE username=?", (self.username,))
-            following = cursor.fetchall()
-            cursor.execute("SELECT following FROM following WHERE username=?", (self.user,))
-            user_followers = cursor.fetchall()
+            cursor.execute("SELECT target FROM follows WHERE stalker=?", (self.username,))
+            following = cursor.fetchall()   
 
-        #check for mutual following
-        for follower in following:
-            if follower in user_followers:
-                mutual.append(follower)
+        mutual = self.user_already_following(following)
 
         return following, mutual
     

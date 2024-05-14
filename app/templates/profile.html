@@ -12,10 +12,11 @@
         <img src="{{ url_for('static', filename='img/pfp_' + username + '.png' )}}"  alt="profile picture">
     </div>
     <div class="profile-info">
-        <p>{{ username }}</p>
-        <p>{{ name }}</p>
-        <p>message   add</p>
-        <p><b>{{ post_count }}</b> posts  <b>{{ followers }}</b> followers  <b>{{ following }}</b> following</p>
+        <p>{{ username }} | {{ name }} </p>
+        <p>message &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; follow</p>
+        <p><b>{{ post_count }}</b> posts  <b>{{ followers }}</b> <a href="followers">followers</a>  
+        <b>{{ following }}</b> <a href="following"> following</a></p>
+        </br>
         <p>{{ bio }}</p>
     </div>
 </div>

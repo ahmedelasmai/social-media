@@ -32,15 +32,29 @@ def profile():
                            ,bio=bio, followers=followers,following=following,posts=posts,
                            post_count=post_count)
 
-@app.route('/followers')
+@app.route('/followers', methods = ['GET', 'POST'])
 def followers():
+    #when press follow button
+    if request.method == 'POST':
+        target_user = request.form['button']
+        db.follow(target_user)
+        return redirect(url_for('followers'))
+     
+    #display follower list
     followers_list, mutual = db.get_followers()
     return render_template('followers.html',followers_list=followers_list, mutual=mutual)
 
-@app.route('/following')
+@app.route('/following', methods = ['GET', 'POST'])
 def following():
+    #when press follow button
+    if request.method == 'POST':
+        target_user = request.form['button']
+        db.follow(target_user) 
+    
+    #display following list
     following_list, mutual = db.get_following()
     return render_template('following.html',following_list=following_list,mutual=mutual)
+
 
 @app.route('/video', methods = ['GET', 'POST'])
 def videos():
