@@ -12,22 +12,26 @@ class Db:
     
     def user_already_following(self,follows_list):
         mutual = []
-
         with sqlite3.connect('social media.db') as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT target FROM follows WHERE stalker=?", (self.user,))
-            user_followers = cursor.fetchall()
-        
+            user_follows = cursor.fetchall()
+    
         for follower in follows_list:
-            if follower in user_followers:
+            if follower in user_follows:
                 mutual.append(follower)
-
         return mutual
 
     def follow(self, target_user):
         with sqlite3.connect('social media.db') as conn:
             cursor = conn.cursor()
             cursor.execute("INSERT INTO follows (stalker,target) VALUES (?,?)", (self.user, target_user))
+            conn.commit()
+
+    def unfollow(self, target_user):
+        with sqlite3.connect('social media.db') as conn:
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM follows WHERE stalker=? AND target=?",(self.user,target_user))
             conn.commit()
 
     def load_profile(self):
@@ -50,7 +54,8 @@ class Db:
                 del posts[i]
                 formated_date = post[3][:9]
                 post[3] = formated_date
-                posts.insert(i,post)    
+                posts.insert(i,post)   
+
         return user_info[:3], followers[0][0], follows[0][0], posts, post_count
     
     def get_followers(self): 

@@ -36,9 +36,14 @@ def profile():
 def followers():
     #when press follow button
     if request.method == 'POST':
-        target_user = request.form['button']
-        db.follow(target_user)
-        return redirect(url_for('followers'))
+        if 'follow' in request.form:
+            target_user = request.form['follow']
+            db.follow(target_user)
+
+        elif 'unfollow' in request.form:
+            target_user = request.form['unfollow']
+            db.unfollow(target_user)
+        
      
     #display follower list
     followers_list, mutual = db.get_followers()
@@ -48,9 +53,14 @@ def followers():
 def following():
     #when press follow button
     if request.method == 'POST':
-        target_user = request.form['button']
-        db.follow(target_user) 
-    
+        if 'follow' in request.form:
+            target_user = request.form['follow']
+            db.follow(target_user)
+
+        elif 'unfollow' in request.form:
+            target_user = request.form['unfollow']
+            db.unfollow(target_user)
+
     #display following list
     following_list, mutual = db.get_following()
     return render_template('following.html',following_list=following_list,mutual=mutual)

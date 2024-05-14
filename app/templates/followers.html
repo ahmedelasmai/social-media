@@ -5,11 +5,14 @@
 
 {% for follower in followers_list %}
     {% if follower in mutual %}
-        <p>{{ follower[0] }}   following</p>
+        <form action="/followers" method="post">
+            <p style="display: inline-block;">{{ follower[0] }}</p>
+            <button type="submit" name="unfollow" value="{{ follower[0] }}">unfollow</button>
+        </form>
     {% else %}
     <form action="/followers" method="post">
         <p style="display: inline-block;"> {{ follower[0] }}</p>
-        <button type="submit" name="button" value="{{ follower[0] }}">follow</button>
+        <button type="submit" name="follow" value="{{ follower[0] }}">follow</button>
     </form>
     {% endif %}
 {% endfor %}
