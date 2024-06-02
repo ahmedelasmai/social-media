@@ -43,20 +43,10 @@ class Db:
             followers = cursor.fetchall()
             cursor.execute("SELECT COUNT(target) FROM Follows WHERE stalker=?", (self.username,))
             follows = cursor.fetchall()
-            cursor.execute("SELECT PostID, Content, Image, Timestamp FROM Post WHERE Username=? ORDER BY Timestamp ASC",
-                            (self.username,))
-            posts = cursor.fetchall() #tupil
-            post_count = len(posts)
-                                                                                                                                
-            #removes seconds from timestamp
-            for i in range(len(posts)):
-                post = list(posts[i])
-                del posts[i]
-                formated_date = post[3][:9]
-                post[3] = formated_date
-                posts.insert(i,post)   
+        
+        posts = self.posts(self.username)
 
-        return user_info[:3], followers[0][0], follows[0][0], posts, post_count
+        return user_info[:3], followers[0][0], follows[0][0]
     
     def get_followers(self): 
         with sqlite3.connect('social media.db') as conn:
@@ -79,18 +69,59 @@ class Db:
 
         return following, mutual
     
+    def posts(self,user=None):
+
+        with sqlite3.connect('social media.db') as conn:
+            cursor = conn.cursor()
+            base_query = """
+            SELECT 
+                post.PostId,
+                Post.Username, 
+                Post.Content, 
+                Post.Image, 
+                Post.Timestamp,
+                COUNT(Likes.LikeID) AS LikeCount,
+                GROUP_CONCAT(Hashtag.Hashtag, ', ') AS Hashtags
+            FROM 
+                Post
+            LEFT JOIN 
+                Likes ON Post.PostID = Likes.PostID
+            LEFT JOIN
+                Hashtag ON Post.PostID = Hashtag.PostID
+            GROUP BY 
+                Post.PostID;
+            """
+            #if posts is not searching for specific user it will search all posts
+            if user:
+                query = f"{base_query} WHERE {user} GROUP BY Post.PostID;"
+            else:
+                query = f"{base_query} GROUP BY Post.PostID;"
+
+            cursor.execute(query)
+            post_info = cursor.fetchall()
+        
+
+                                                                                                                   
+        #formats timestamp and hashtags
+        for i in range(len(post_info)):
+            post = list(post_info[i])
+            del post_info[i]
+            formated_date = post[4][:9]
+            post[4] = formated_date
+            post_info.insert(i,post) 
+            if post[6]:
+                post[6] = post[6].replace(" ", "").replace(",", "")
+
+        return post_info
+        
      #test this
-    def post_info(self, postId): 
+    def comments(self, postId):  #DEAL WITH ITS NAME --------------------------------
         with sqlite3.connect('social media.db') as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT Content, Username, Timestamp FROM Comment WHERE PostID=?", (postId,))
             comment_info = cursor.fetchall()
-            cursor.execute("SELECT COUNT(LikeID) FROM Likes WHERE PostID=?", (postId,))
-            likes = cursor.fetchone()
-            cursor.execute("SELECT Hashtag FROM Hashtag WHERE PostID=?", (postId,))
-            hashtags = cursor.fetchall()
 
-        return comment_info, likes, hashtags
+        return comment_info
 
 
     def user_exists(self, username):
@@ -112,8 +143,6 @@ class Db:
 
 # db = Db()
 # db.user_exists('@user1')
-# followers = db.get_followers()
-# print(followers)
-
-#[('@user2',), ('@user3',)]
-
+# post = db.posts()
+# print(post)
+# #[1, '@user1', 'First post content', 1, '2024-05-0', 2, '#food#travel']

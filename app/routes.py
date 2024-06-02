@@ -23,14 +23,12 @@ def index():
 
 @app.route('/profile')
 def profile():
-    user_info,followers, following, posts, post_count = db.load_profile()
+    postId,user_info,followers, following, posts = db.posts()
     username, name , bio = user_info[:3]
 
-            #how to display posts 
     
-    return render_template('profile.html',username=username,name=name
-                           ,bio=bio, followers=followers,following=following,posts=posts,
-                           post_count=post_count)
+    return render_template('profile.html',postId=postId,username=username,name=name
+                           ,bio=bio, followers=followers,following=following,posts=posts)
 
 @app.route('/followers', methods = ['GET', 'POST'])
 def followers():
