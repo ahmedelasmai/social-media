@@ -22,7 +22,7 @@
     <div class="row">
         <!--left-->
         <div class="col-md-3 border">
-            <nav class="nav flex-column">
+            <nav class="mt-2 flex-column sticky-top">
                 <i class="fa-4x fa-solid fa-hashtag"></i>
                 <a class="nav-link  text-dark mt-3" href="">Home</a>
                 <a class="nav-link text-dark" href="">Search</a>
@@ -36,7 +36,7 @@
         </div>
 
         <!-- middle -->
-        <div class="col-md-6">
+        <div class="col-md-6" id="middle-column">
         {% for post in feed %}
         <div class="card tweet-card">
             <div class="card-body">
@@ -66,7 +66,9 @@
         </div>
         <!-- right -->
         <div class="col-3 border">
-            <big>Friends</big>
+            <div class="sticky-top">
+                <big>Friends</big>
+            </div>
         </div>
     </div>
   </div>
