@@ -74,48 +74,56 @@ class Db:
         with sqlite3.connect('social media.db') as conn:
             cursor = conn.cursor()
             base_query = """
-            SELECT 
-                post.PostId,
-                Post.Username, 
-                Post.Content, 
-                Post.Image, 
-                Post.Timestamp,
-                COUNT(Likes.LikeID) AS LikeCount,
-                GROUP_CONCAT(Hashtag.Hashtag, ', ') AS Hashtags
-            FROM 
-                Post
-            LEFT JOIN 
-                Likes ON Post.PostID = Likes.PostID
-            LEFT JOIN
-                Hashtag ON Post.PostID = Hashtag.PostID
-            GROUP BY 
-                Post.PostID;
+SELECT 
+    Post.PostID,
+    Post.Username, 
+    User.Name, 
+    Post.Content, 
+    Post.Image, 
+    Post.Timestamp,
+    COUNT(Likes.LikeID) AS LikeCount,
+    GROUP_CONCAT(Hashtag.Hashtag, ' ') AS Hashtags,
+    COUNT(Comment.CommentID) AS CommentCount
+FROM 
+    Post
+LEFT JOIN 
+    Likes ON Post.PostID = Likes.PostID
+LEFT JOIN 
+    Hashtag ON Post.PostID = Hashtag.PostID
+LEFT JOIN 
+    User ON Post.Username = User.Username
+LEFT JOIN
+    Comment ON Post.PostID = Comment.PostID
             """
             #if posts is not searching for specific user it will search all posts
             if user:
-                query = f"{base_query} WHERE {user} GROUP BY Post.PostID;"
+                
+                query = f"{base_query} WHERE Post.Username = ? GROUP BY Post.PostID"
+                cursor.execute(query, (user,))
             else:
-                query = f"{base_query} GROUP BY Post.PostID;"
+                
+                query = f"{base_query} GROUP BY Post.PostID"
+                cursor.execute(query)
 
-            cursor.execute(query)
+            
             post_info = cursor.fetchall()
-        
+                            
 
-                                                                                                                   
         #formats timestamp and hashtags
         for i in range(len(post_info)):
             post = list(post_info[i])
             del post_info[i]
-            formated_date = post[4][:9]
-            post[4] = formated_date
+            formated_date = post[5][:9]
+            post[5] = formated_date
             post_info.insert(i,post) 
-            if post[6]:
-                post[6] = post[6].replace(" ", "").replace(",", "")
 
-        return post_info
+            if post[7] == None:
+                post[7] = ''
+
+        return post_info #[1, '@user1', 'User One', 'First post content by @user1', 1, '2024-06-0', 2, '#food #travel', 2]
         
      #test this
-    def comments(self, postId):  #DEAL WITH ITS NAME --------------------------------
+    def comments(self, postId): 
         with sqlite3.connect('social media.db') as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT Content, Username, Timestamp FROM Comment WHERE PostID=?", (postId,))
@@ -141,8 +149,8 @@ class Db:
         #ADD AN @ INFORT OF USERNAME
         #create default pfp
 
-# db = Db()
-# db.user_exists('@user1')
-# post = db.posts()
-# print(post)
-# #[1, '@user1', 'First post content', 1, '2024-05-0', 2, '#food#travel']
+db = Db()
+db.user_exists('@user1')
+post = db.posts()
+print(post)
+# #[1, '@user1', 'User One', 'First post content by @user1', 1, '2024-06-0', 2, '#food #travel', 2]

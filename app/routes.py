@@ -9,21 +9,24 @@ db = Db()
 @app.route('/')      
 @app.route('/index', methods = ['GET', 'POST'])
 def index():
-    if request.method == 'POST':
-        search = request.form['search']
-        if search[0] == '@':
-            profiles = db.user_exists(search)
-            if profiles:                          
-                return redirect(url_for('profile')) 
-            else:
-                return redirect(url_for('index'))
-        video.search(search)
-        return redirect(url_for('videos'))    
-    return render_template('index.html')
+    # if request.method == 'POST':
+    #     search = request.form['search']
+    #     if search[0] == '@':
+    #         profiles = db.user_exists(search)
+    #         if profiles:                          
+    #             return redirect(url_for('profile')) 
+    #         else:
+    #             return redirect(url_for('index'))
+    #     video.search(search)
+    #     return redirect(url_for('videos')) 
+
+    feed = db.posts()                
+    
+    return render_template('index.html',feed=feed)
 
 @app.route('/profile')
 def profile():
-    postId,user_info,followers, following, posts = db.posts()
+    postId,user_info,followers, following, posts = db.posts()  #make it into feed???
     username, name , bio = user_info[:3]
 
     
