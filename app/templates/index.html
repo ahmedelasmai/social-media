@@ -1,17 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Social Media Feed</title>
+  <!-- boostrap -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <!-- css -->
+  <link href="css/styles.css" rel="stylesheet">
+  <!-- font awesome -->
+  <script src="https://kit.fontawesome.com/4af5eae8db.js" crossorigin="anonymous"></script>
 </head>
 <body>
-    <h1>Social Media</h1>
-</body>
+  <div class="container mt-3">
+    <div class="row">
+        <!--left-->
+        <div class="col-md-3 border">
+            <nav class="nav flex-column">
+                <i class="fa-4x fa-solid fa-hashtag"></i>
+                <a class="nav-link  text-dark mt-3" href="">Home</a>
+                <a class="nav-link text-dark" href="">Search</a>
+                <a class="nav-link text-dark" href="">Reels</a>
+                <a class="nav-link text-dark" href="">Messages</a>
+                <a class="nav-link text-dark" href="">Notifications</a>
+                <a class="nav-link text-dark" href="">Post</a>
+                <a class="nav-link text-dark" href="">Profile</a>
+                <a class="nav-link text-dark" href="">More</a>
+            </nav>
+        </div>
 
-<form action="/index" method="post">
+        <!-- middle -->
+        <div class="col-md-6">
+        {% for post in feed %}
+        <div class="card tweet-card">
+            <div class="card-body">
+            <div class="d-flex align-items-center">
+                <img src="" class="rounded-circle mr-3" alt="User Avatar">
+                <div>
+                <h5 class="mb-0">{{ post[2] }}</h5>
+                <small class="text-muted">{{ post[1] }} · {{ post[5] }}</small>
+                </div>
+            </div>
+            <div class="tweet-content">
+                <p>{{ post[3] }}</p>
+            <div class="d-flex justify-content-center align-items-center">
+                <img src="{{ url_for('static', filename='img/post_' + post[1] | string + '.png') }}" class="img-fluid rounded tweet-image" alt="Tweet Image">
+            </div>
+            </div>
+            <div class="tweet-footer">
+                <a href="#" class="text-muted"><i class="fas fa-comment"></i> {{ post[8] }} </a>
+                <a href="#" class="text-muted"><i class="fas fa-heart"></i>{{ post[6] }}</a>
+            </div>
+            </div>
+        </div>
+        {% endfor %}
+        </div>
+        <!-- right -->
+        <div class="col-3 border">
+            <big>Friends</big>
+        </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+</body>
+</html>
+
+<!-- <form action="/index" method="post">
 <label for="search"></label><br>
 <input type="text" id="search" name="search"><br>
-</form>
-
-</html>
+</form> -->
