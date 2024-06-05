@@ -12,9 +12,9 @@
         <img src="{{ url_for('static', filename='img/pfp_' + username + '.png' )}}"  alt="profile picture">
     </div>
     <div class="profile-info">
-        <p>{{ username }} | {{ name }} </p>
+        <p>{{ name }} {{ username }}</p>
         <p>message &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; follow</p>
-        <p><b>{{ post_count }}</b> posts  <b>{{ followers }}</b> <a href="followers">followers</a>  
+        <p>  <b>{{ followers }}</b> <a href="followers">followers</a>  
         <b>{{ following }}</b> <a href="following"> following</a></p>
         </br>
         <p>{{ bio }}</p>
@@ -25,12 +25,12 @@
     {% for post in posts %}
     <div class="post">
         <div class="post-image">
-            {% if post[2] == 1 %}
-            <img src="{{ url_for('static', filename='img/post_' + post[0] | string + '.png') }}">
+            {% if post[4] == 1 %}
+            <img src="{{ url_for('static', filename='img/post_' + post[1] | string + '.png') }}">
             {% endif %}
         </div>
         <div class="post-text">
-            <p>{{ post[1] }}</p>
+            <p>{{ post[3] }}</p>
         </div>
     </div>
     {% if loop.index % 3 == 0 %}
