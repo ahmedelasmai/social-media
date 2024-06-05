@@ -10,6 +10,12 @@
   <link href="css/styles.css" rel="stylesheet">
   <!-- font awesome -->
   <script src="https://kit.fontawesome.com/4af5eae8db.js" crossorigin="anonymous"></script>
+  <style>
+    .pfp img {
+      width: 42px;
+      height: 42px;
+    }
+  </style>
 </head>
 <body>
   <div class="container mt-3">
@@ -35,16 +41,19 @@
         <div class="card tweet-card">
             <div class="card-body">
             <div class="d-flex align-items-center">
-                <img src="" class="rounded-circle mr-3" alt="User Avatar">
+                <span class="pfp">
+                <img src="{{ url_for('static', filename='img/pfp_' ~ post[1] | string + '.png') }}" class="rounded-circle mr-1 pfp" alt="User Avatar"> </span>
                 <div>
-                <h5 class="mb-0">{{ post[2] }}</h5>
+                <h5 class="mb-0">{{ post[2] }}</h5>  
                 <small class="text-muted">{{ post[1] }} · {{ post[5] }}</small>
                 </div>
             </div>
-            <div class="tweet-content">
+            <div class="mt-2 tweet-content">
                 <p>{{ post[3] }}</p>
-            <div class="d-flex justify-content-center align-items-center">
-                <img src="{{ url_for('static', filename='img/post_' + post[1] | string + '.png') }}" class="img-fluid rounded tweet-image" alt="Tweet Image">
+            <div class="d-flex justify-content-center">
+                {% if post[4] == 1 %}
+                <img src="{{ url_for('static', filename='img/post_' ~ post[0] | string + '.png') }}" class="img-fluid rounded tweet-image" alt="Tweet Image">
+                {% endif %}
             </div>
             </div>
             <div class="tweet-footer">
