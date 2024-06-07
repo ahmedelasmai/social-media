@@ -3,7 +3,7 @@ import sqlite3
 class Db:
 
     def __init__(self):            #debug     
-        self.username = '@user1'   #
+        self.username = '@user2'   #
         self.user = '@user1' 
         
     #                                     DEBUG
@@ -18,8 +18,14 @@ class Db:
             user_follows = cursor.fetchall()
     
         for follower in follows_list:
-            if follower in user_follows:
+            found = False
+            for user_follow in user_follows:
+                if follower[0] == user_follow[0]:
+                    found = True
+                    break
+            if found:
                 mutual.append(follower)
+        
         return mutual
 
     def follow(self, target_user):
@@ -44,27 +50,32 @@ class Db:
             cursor.execute("SELECT COUNT(target) FROM Follows WHERE stalker=?", (self.username,))
             follows = cursor.fetchall()
         
-        posts = self.posts(self.username)
+        posts, hashtags = self.posts(self.username)
 
-        return user_info[:3], followers[0][0], follows[0][0]
+        return user_info[:3], followers[0][0], follows[0][0],posts, hashtags
     
     def get_followers(self): 
         with sqlite3.connect('social media.db') as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT stalker FROM follows WHERE target=?", (self.username,))
-            followers = cursor.fetchall()
-    
-        mutual = self.user_already_following(followers) 
-        
-        return followers, mutual
+            cursor.execute("""SELECT follows.stalker, User.Name, User.bio  
+                           FROM follows
+                           LEFT JOIN User ON follows.stalker = User.Username
+                           WHERE target=?""", (self.username,))
+            follower = cursor.fetchall()   
+            
+        mutual = self.user_already_following(follower)
+
+        return follower, mutual
 
     def get_following(self):
-        mutual = []
         with sqlite3.connect('social media.db') as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT target FROM follows WHERE stalker=?", (self.username,))
+            cursor.execute("""SELECT follows.target, User.Name, User.bio  
+                           FROM follows
+                           LEFT JOIN User ON follows.target = User.Username
+                           WHERE stalker=?""", (self.username,))
             following = cursor.fetchall()   
-
+            
         mutual = self.user_already_following(following)
 
         return following, mutual
@@ -74,26 +85,26 @@ class Db:
         with sqlite3.connect('social media.db') as conn:
             cursor = conn.cursor()
             base_query = """
-SELECT 
-    Post.PostID,
-    Post.Username, 
-    User.Name, 
-    Post.Content, 
-    Post.Image, 
-    Post.Timestamp,
-    COUNT(Likes.LikeID) AS LikeCount,
-    GROUP_CONCAT(Hashtag.Hashtag, ' ') AS Hashtags,
-    COUNT(Comment.CommentID) AS CommentCount
-FROM 
-    Post
-LEFT JOIN 
-    Likes ON Post.PostID = Likes.PostID
-LEFT JOIN 
-    Hashtag ON Post.PostID = Hashtag.PostID
-LEFT JOIN 
-    User ON Post.Username = User.Username
-LEFT JOIN
-    Comment ON Post.PostID = Comment.PostID
+            SELECT 
+                Post.PostID,
+                Post.Username, 
+                User.Name, 
+                Post.Content, 
+                Post.Image, 
+                Post.Timestamp,
+                COUNT(Likes.LikeID) AS LikeCount,
+                GROUP_CONCAT(Hashtag.Hashtag, ' ') AS Hashtags,
+                COUNT(Comment.CommentID) AS CommentCount
+            FROM 
+                Post
+            LEFT JOIN 
+                Likes ON Post.PostID = Likes.PostID
+            LEFT JOIN 
+                Hashtag ON Post.PostID = Hashtag.PostID
+            LEFT JOIN 
+                User ON Post.Username = User.Username
+            LEFT JOIN
+                Comment ON Post.PostID = Comment.PostID
             """
             #if posts is not searching for specific user it will search all posts
             if user:
@@ -104,26 +115,37 @@ LEFT JOIN
                 
                 query = f"{base_query} GROUP BY Post.PostID"
                 cursor.execute(query)
-
-            
             post_info = cursor.fetchall()
-                            
 
-        #formats timestamp and hashtags
+            #gets hashtags array
+            cursor = conn.cursor()
+            cursor.execute("SELECT Hashtag, Timestamp FROM Hashtag LIMIT 6")
+            hashtags = cursor.fetchall()                
+
+        #formats timestamp
         for i in range(len(post_info)):
             post = list(post_info[i])
             del post_info[i]
             formated_date = post[5][:9]
             post[5] = formated_date
             post_info.insert(i,post) 
-
+            #formats hashtags in posts
             if post[7] == None:
                 post[7] = ''
 
-        return post_info #[1, '@user1', 'User One', 'First post content by @user1', 1, '2024-06-0', 2, '#food #travel', 2]
-        
+        #formats time stamp in hashtags list
+        for i in range(6):
+            hashtag = list(hashtags[i])
+            del hashtags[i]
+            formated_date = hashtag[1][:9]
+            hashtag[1] = formated_date
+            hashtags.insert(i,hashtag)
+
+        return post_info, hashtags 
+
+
      #test this
-    def comments(self, postId): 
+    def get_comments(self, postId): 
         with sqlite3.connect('social media.db') as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT Content, Username, Timestamp FROM Comment WHERE PostID=?", (postId,))
@@ -149,8 +171,10 @@ LEFT JOIN
         #ADD AN @ INFORT OF USERNAME
         #create default pfp
 
-db = Db()
-db.user_exists('@user1')
-post = db.posts()
-print(post)
+# db = Db()
+# db.user_exists('@user1')
+# post = db.get_hashtags()
+# print('fo',post)
+
+
 # #[1, '@user1', 'User One', 'First post content by @user1', 1, '2024-06-0', 2, '#food #travel', 2]
