@@ -26,11 +26,11 @@ def index():
 
 @app.route('/profile')
 def profile():
-    user_info,followers, following, feed, hashtags = db.load_profile()  
+    user_info,followers, following, feed, = db.load_profile()  
     username, name , bio = user_info[:3]
     
     return render_template('profile.html',username=username,name=name
-                           ,bio=bio, followers=followers,following=following,feed=feed,hashtags=hashtags)
+                           ,bio=bio, followers=followers,following=following,feed=feed)
 
 @app.route('/followers', methods = ['GET', 'POST'])
 def followers():

@@ -126,7 +126,7 @@ class Db:
         for i in range(len(post_info)):
             post = list(post_info[i])
             del post_info[i]
-            formated_date = post[5][:9]
+            formated_date = post[5][:10]
             post[5] = formated_date
             post_info.insert(i,post) 
             #formats hashtags in posts
@@ -137,7 +137,7 @@ class Db:
         for i in range(6):
             hashtag = list(hashtags[i])
             del hashtags[i]
-            formated_date = hashtag[1][:9]
+            formated_date = hashtag[1][:10]
             hashtag[1] = formated_date
             hashtags.insert(i,hashtag)
 
