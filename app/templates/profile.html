@@ -1,42 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Social Media App</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Social Media Feed</title>
+  <!-- boostrap -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <!-- css -->
+  <link href="css/styles.css" rel="stylesheet">
+  <!-- font awesome -->
+  <script src="https://kit.fontawesome.com/4af5eae8db.js" crossorigin="anonymous"></script>
+  <style>
+    .pfp {
+      width: 42px;
+      height: 42px;
+    }
+    .pfp2 {
+      width: 150px;
+      height: 150px;
+    }
+  </style>
 </head>
 <body>
-<div class="profile-container">
-    <div class="profile-picture">
-        <img src="{{ url_for('static', filename='img/pfp_' + username + '.png' )}}"  alt="profile picture">
-    </div>
-    <div class="profile-info">
-        <p>{{ name }} {{ username }}</p>
-        <p>message &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; follow</p>
-        <p>  <b>{{ followers }}</b> <a href="followers">followers</a>  
-        <b>{{ following }}</b> <a href="following"> following</a></p>
-        </br>
-        <p>{{ bio }}</p>
-    </div>
-</div>
+  <div class="container mt-3">
+    <div class="row">
+        <!--left-->
+        <div class="col-md-3 border">
+            <nav class="mt-2 flex-column sticky-top">
+                <a href="/index" class="text-dark nav-link fa-4x fa-solid fa-house"></a>
+                <form action="/index" method="post" class="mt-3 form-inline">
+                    <input type="text" class="form-control" placeholder="Search" name="search">
+                </form>
+                <a class="nav-link text-dark" href=""><i class="mr-2 fa-solid fa-tv"></i>Reels</a>
+                <a class="nav-link text-dark" href=""><i class="mr-2 fa-solid fa-message"></i>Messages</a>
+                <a class="nav-link text-dark" href=""><i class="mr-2 fa-solid fa-bell"></i>Notifications</a>
+                <a class="nav-link text-dark" href=""><i class="mr-2 fa-brands fa-twitter"></i>Post</a>
+                <a class="nav-link text-dark" href=""><i class="mr-2 fa-solid fa-user"></i>Profile</a>
+                <a class="nav-link text-dark" href=""><i class="mr-2 fa-solid fa-bars"></i>More</a>
+            </nav>
+        </div>
 
-<div class="post-container">
-    {% for post in posts %}
-    <div class="post">
-        <div class="post-image">
-            {% if post[4] == 1 %}
-            <img src="{{ url_for('static', filename='img/post_' + post[1] | string + '.png') }}">
-            {% endif %}
+        <!-- middle -->
+        <div class="col-md-6">
+            <div class="">
+            <img src="{{ url_for('static', filename='img/pfp_' + username + '.png' )}}"  alt="profile picture" class="rounded-circle mr-1 pfp2">
+            <h4>{{ name }}</h4>
+            <p class="text-secondary"> {{ username }} </p>
+            <p class="mt-3"> {{ bio }} </p>
+            <div>
+               <div class="d-inline-block"><b>{{ followers }}</b> <a class="text-secondary" href="followers">followers</a></div>
+               <div class="ml-3 d-inline-block"><b>{{ following }}</b> <a class="text-secondary" href="following"> following</a></div>
+            </div>
+            <div class="mt-4"><i class="mr-2 fa-solid fa-message"></i><a class="text-dark" href="#messages">message</a></div>
+        <hr>
         </div>
-        <div class="post-text">
-            <p>{{ post[3] }}</p>
+        <div class="mt-3">    
+            {% for post in feed %}
+            <div class="card tweet-card">
+                <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <span class="pfp">
+                    <img src="{{ url_for('static', filename='img/pfp_' ~ post[1] | string + '.png') }}" class="rounded-circle mr-2 pfp" alt="User Avatar"> </span>
+                    <div>
+                    <h5 class="mb-0">{{ post[2] }}</h5>  
+                    <small class="text-muted">{{ post[1] }} · {{ post[5] }}</small>
+                    </div>
+                </div>
+                <div class="mt-2 tweet-content">
+                    <p class="mb-0">{{ post[3] }}</p>
+                    <p class="text-muted">{{ post[7] }}</p>
+                <div class="d-flex justify-content-center">
+                    {% if post[4] == 1 %}
+                    <img src="{{ url_for('static', filename='img/post_' ~ post[0] | string + '.png') }}" class="img-fluid rounded tweet-image" alt="Tweet Image">
+                    {% endif %}
+                </div>
+                </div>
+                <div class="tweet-footer">
+                    <a href="#" class="text-muted"><i class="fas fa-comment"></i> {{ post[8] }} </a>
+                    <a href="#" class="text-muted"><i class="fas fa-heart"></i> {{ post[6] }}</a>
+                </div>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+        </div>
+
+        <!-- right -->
+        <div class="col-3 border">
+            <div class="sticky-top pt-3">
+                <h3 class="mb-3">Latest</h3>
+                {% for hashtag in hashtags %}
+                <div class="media border pt-3 pb-3 pl-2">
+                    <div class="media-body">
+                      <p class="mt-0 mb-0">{{ hashtag[0] }}</p>
+                      <small> {{ hashtag[1] }} </small>
+                    </div>
+                  </div>
+                 {% endfor %} 
+            </div>
         </div>
     </div>
-    {% if loop.index % 3 == 0 %}
-    </div><div class="post-container">
-    {% endif %}
-    {% endfor %}
-</div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://kit.fontawesome.com/a076d05399.js"></script>
 </body>
 </html>
+
