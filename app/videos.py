@@ -7,8 +7,11 @@ class Videos:
         self.index = 0
         self.page = 1
     
-    def search(self, search):
-        self.search = search
+    def search(self, search_query):
+        self.search_query = search_query
+        links = self.get_video
+        return links, self.index, self.page
+    
     def change(self, move='none'):
         links = self.get_video()
         if move == 'next':
@@ -53,20 +56,18 @@ class Videos:
         }
 
         params = {
-            "query" : self.search,
+            "query" : self.search_query,
             "page"  : self.page
         }
 
         response = requests.get('https://api.pexels.com/videos/search', params=params, headers=headers)  
-
-        if response.status_code == 200:
+        if response.status_code == 200: 
             data = response.json()
             videos = data['videos']
             
             for link in videos:
                 links.append(link['video_files'][0]['link'])
-                
         else:
-            print('error', response.status_code)    
-            
+            print('error', response.status_code) 
+
         return links

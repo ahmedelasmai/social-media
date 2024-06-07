@@ -9,29 +9,28 @@ db = Db()
 @app.route('/')      
 @app.route('/index', methods = ['GET', 'POST'])
 def index():
-    # if request.method == 'POST':
-    #     search = request.form['search']
-    #     if search[0] == '@':
-    #         profiles = db.user_exists(search)
-    #         if profiles:                          
-    #             return redirect(url_for('profile')) 
-    #         else:
-    #             return redirect(url_for('index'))
-    #     video.search(search)
-    #     return redirect(url_for('videos')) 
+    if request.method == 'POST':
+        search = request.form['search']
+        if search[0] == '@':
+            profiles = db.user_exists(search)
+            if profiles:                          
+                return redirect(url_for('profile')) 
+            else:
+                return redirect(url_for('index'))
+        video.search(search)
+        return redirect(url_for('videos')) 
 
-    feed = db.posts()                
+    feed, hashtags = db.posts()                
     
-    return render_template('index.html',feed=feed)
+    return render_template('index.html',feed=feed,hashtags=hashtags)
 
 @app.route('/profile')
 def profile():
-    postId,user_info,followers, following, posts = db.posts()  #make it into feed???
+    user_info,followers, following, feed, hashtags = db.load_profile()  
     username, name , bio = user_info[:3]
-
     
-    return render_template('profile.html',postId=postId,username=username,name=name
-                           ,bio=bio, followers=followers,following=following,posts=posts)
+    return render_template('profile.html',username=username,name=name
+                           ,bio=bio, followers=followers,following=following,feed=feed,hashtags=hashtags)
 
 @app.route('/followers', methods = ['GET', 'POST'])
 def followers():
@@ -47,7 +46,7 @@ def followers():
         
      
     #display follower list
-    followers_list, mutual = db.get_followers()
+    followers_list, mutual= db.get_followers()
     return render_template('followers.html',followers_list=followers_list, mutual=mutual)
 
 @app.route('/following', methods = ['GET', 'POST'])
