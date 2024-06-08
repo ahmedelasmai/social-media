@@ -34,6 +34,11 @@ def index():
     feed, hashtags = db.posts()                    
     return render_template('index.html',feed=feed,hashtags=hashtags)
 
+@app.route('/post')
+def post():
+
+    return render_template('post.html')
+
 @app.route('/profile')
 def profile():
     user_info,followers, following, feed,hashtags = db.load_profile()  

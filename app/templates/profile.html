@@ -34,7 +34,7 @@
                 <a class="nav-link text-dark" href=""><i class="mr-2 fa-solid fa-tv"></i>Reels</a>
                 <a class="nav-link text-dark" href=""><i class="mr-2 fa-solid fa-message"></i>Messages</a>
                 <a class="nav-link text-dark" href=""><i class="mr-2 fa-solid fa-bell"></i>Notifications</a>
-                <a class="nav-link text-dark" href=""><i class="mr-2 fa-brands fa-twitter"></i>Post</a>
+                <a class="nav-link text-dark" href="/post"><i class="mr-2 fa-brands fa-twitter"></i>Post</a>
                 <a class="nav-link text-dark" href=""><i class="mr-2 fa-solid fa-user"></i>Profile</a>
                 <a class="nav-link text-dark" href=""><i class="mr-2 fa-solid fa-bars"></i>More</a>
             </nav>
@@ -71,7 +71,7 @@
                     <p class="text-muted">{{ post[7] }}</p>
                 <div class="d-flex justify-content-center">
                     {% if post[4] == 1 %}
-                    <img src="{{ url_for('static', filename='img/post_' ~ post[0] | string + '.png') }}" class="img-fluid rounded tweet-image" alt="Tweet Image">
+                    <img src="{{ url_for('static', filename='img/' ~ post[0] | string + '.png') }}" class="img-fluid rounded tweet-image" alt="Tweet Image">
                     {% endif %}
                 </div>
                 </div>
