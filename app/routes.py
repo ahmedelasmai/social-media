@@ -11,26 +11,36 @@ db = Db()
 def index():
     if request.method == 'POST':
         search = request.form['search']
+        if search[0] == '#':
+            does_hashtag_exist = db.hashtag_exists(search)
+
+            if does_hashtag_exist is False:
+                return redirect(url_for('index')) 
+            else:
+                feed, hashtags = db.posts(search_hashtag=search)
+                return render_template('index.html',feed=feed,hashtags=hashtags)
+                  
+                        
         if search[0] == '@':
             profiles = db.user_exists(search)
             if profiles:                          
                 return redirect(url_for('profile')) 
             else:
                 return redirect(url_for('index'))
+            
         video.search(search)
         return redirect(url_for('videos')) 
 
-    feed, hashtags = db.posts()                
-    
+    feed, hashtags = db.posts()                    
     return render_template('index.html',feed=feed,hashtags=hashtags)
 
 @app.route('/profile')
 def profile():
-    user_info,followers, following, feed, = db.load_profile()  
+    user_info,followers, following, feed,hashtags = db.load_profile()  
     username, name , bio = user_info[:3]
     
     return render_template('profile.html',username=username,name=name
-                           ,bio=bio, followers=followers,following=following,feed=feed)
+                           ,bio=bio, followers=followers,following=following,feed=feed,hashtags=hashtags)
 
 @app.route('/followers', methods = ['GET', 'POST'])
 def followers():
