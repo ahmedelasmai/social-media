@@ -34,9 +34,18 @@ def index():
     feed, hashtags = db.posts()                    
     return render_template('index.html',feed=feed,hashtags=hashtags)
 
-@app.route('/post')
+@app.route('/post', methods = ['GET', 'POST'])
 def post():
+    if request.method == 'POST':
+        tweet = request.form.get('tweet')
+        img_file = request.files.get('file')
+        print(img_file)
+        successful = db.upload(tweet=tweet, image_file=img_file)
 
+        if successful:
+            return redirect(url_for('profile'))
+    
+    print('failed')
     return render_template('post.html')
 
 @app.route('/profile')

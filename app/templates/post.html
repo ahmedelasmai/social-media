@@ -9,8 +9,8 @@
 </head>
 <body>
     <div class="container mt-5">
-        <h1 class="mb-4">Tweet Something!</h1>
-        <form method="POST" action="/" enctype="multipart/form-data">
+        <h1 class="mb-4">Post Tweet</h1>
+        <form method="POST" action="/post" enctype="multipart/form-data">
             <div class="form-group">
                 <textarea class="form-control" name="tweet" rows="3" placeholder="What's on your mind?" maxlength="280" required></textarea>
                 <small class="form-text text-muted">Maximum 280 characters</small>
@@ -21,18 +21,6 @@
             </div>
             <button type="submit" class="btn btn-primary">Tweet</button>
         </form>
-        <hr>
-        <h2 class="mt-5">Recent Tweets</h2>
-        <ul class="list-group">
-            {% for tweet in tweets %}
-                <li class="list-group-item">
-                    <p>{{ tweet.text }}</p>
-                    {% if tweet.image %}
-                        <img src="{{ url_for('uploaded_file', filename=tweet.image) }}" class="img-fluid" alt="Tweet image">
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
     </div>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>

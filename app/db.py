@@ -1,9 +1,13 @@
 import sqlite3
+from PIL import Image
+import os
+from . import ALLOWED_EXTENSIONS, UPLOAD_FOLDER
+from werkzeug.utils import secure_filename
 
 class Db:
 
     def __init__(self):            #debug     
-        self.username = '@user2'   #
+        self.username = '@user1'   #
         self.user = '@user1' 
         
     #                                     DEBUG
@@ -181,10 +185,46 @@ LEFT JOIN
         pass
         #ADD AN @ INFORT OF USERNAME
         #create default pfp
+    
+    def allowed_file(self, filename):
+        return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    
+    def upload(self, tweet, image_file):
 
-db = Db()
-db.user_exists('@user1')
-post ,h= db.posts()
+        if image_file and self.allowed_file(image_file.filename) and tweet:
+            
+            with sqlite3.connect('social media.db') as conn:
+                cursor = conn.cursor()
+                cursor.execute('SELECT COUNT(*) FROM Post WHERE Username=?',(self.user,))
+                post_rank = cursor.fetchone()[0] + 1
+                postId = self.user + '_' + str(post_rank)
+
+                img = Image.open(image_file)
+                filename = postId + '.png'
+                img.save(os.path.join(UPLOAD_FOLDER, filename), 'PNG')
+
+                cursor.execute("INSERT INTO Post (PostID,Username,Content,Image) VALUES (?,?,?,?)", (postId,self.user,tweet,1))
+                conn.commit()
+            return True
+
+            
+        elif tweet:
+            with sqlite3.connect('social media.db') as conn:
+                cursor = conn.cursor()
+                cursor.execute('SELECT COUNT(*) FROM Post WHERE Username=?',(self.user,))
+                post_rank = cursor.fetchone()[0] + 1
+                postId = self.user + '_' + str(post_rank)
+
+                cursor.execute("INSERT INTO Post (PostID,Username,Content,Image) VALUES (?,?,?,?)", (postId,self.user,tweet,0))
+                conn.commit()
+            return True
+        
+        else:
+            return False
+
+# db = Db()
+# db.user_exists('@user1')
+# post ,h= db.posts()
 
 
 
