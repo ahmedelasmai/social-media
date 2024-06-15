@@ -7,13 +7,26 @@ from werkzeug.utils import secure_filename
 class Db:
 
     def __init__(self):            #debug     
-        self.username = '@user1'   #
-        self.user = '@user1' 
+        self.username = '@user2'   #profile
+        self.user = '@user1'       #logged in as 
         
     #                                     DEBUG
     def loggedin(self):
         self.user = '@user1' 
     
+    def like(self, post_id):
+        with sqlite3.connect('social media.db') as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM Likes WHERE PostID=? AND Username=?",(post_id,self.user))
+            liked = cursor.fetchone()
+
+            if liked is None:
+                cursor.execute("INSERT INTO Likes (PostID,Username) VALUES (?,?)",(post_id,self.user))
+                conn.commit()
+            else:
+                cursor.execute("DELETE FROM Likes WHERE PostID=? AND Username=?",(post_id,self.user))
+                conn.commit()
+
     def user_already_following(self,follows_list):
         mutual = []
         with sqlite3.connect('social media.db') as conn:
@@ -98,26 +111,27 @@ class Db:
     Post.Timestamp,
     (SELECT COUNT(*) FROM Likes WHERE Likes.PostID = Post.PostID) AS LikeCount,
     (SELECT GROUP_CONCAT(Hashtag.Hashtag, ' ') FROM Hashtag WHERE Hashtag.PostID = Post.PostID) AS Hashtags,
-    (SELECT COUNT(*) FROM Comment WHERE Comment.PostID = Post.PostID) AS CommentCount
+    (SELECT COUNT(*) FROM Comment WHERE Comment.PostID = Post.PostID) AS CommentCount,
+    (SELECT LikeID FROM Likes WHERE Likes.PostID = Post.PostID AND likes.username=?) AS IfLiked
 FROM 
     Post
 LEFT JOIN 
     User ON Post.Username = User.Username
             """
-            #if posts is not searching for specific user/hashtag it will search all posts
+            #loads posts for user only
             if user:
                 query = f"{base_query} WHERE Post.Username = ? ORDER BY Post.Timestamp DESC;"
-                cursor.execute(query, (user,))
-            
+                cursor.execute(query, (self.user,user))
+            #loads posts for hashtags only
             elif search_hashtag:
                 query = f'''{base_query} WHERE Post.PostID IN
                 (SELECT PostID FROM Hashtag WHERE Hashtag = ?)
                 ORDER BY Post.Timestamp DESC;'''
-                cursor.execute(query, (search_hashtag,))
-
+                cursor.execute(query, (self.user,search_hashtag))
+            #loads posts for index
             else:
                 query = f"{base_query} ORDER BY Post.Timestamp DESC;"
-                cursor.execute(query)
+                cursor.execute(query, (self.user,))
 
             post_info = cursor.fetchall()
 
@@ -223,9 +237,9 @@ LEFT JOIN
             return False
 
 # db = Db()
-# db.user_exists('@user1')
+# db.posts()
 # post ,h= db.posts()
+# print(post)
 
 
-
-# #[1, '@user1', 'User One', 'First post content by @user1', 1, '2024-06-0', 2, '#food #travel', 2]
+# # ['@user1_4', '@user1', 'User One', '4th content posted', 1, '2024-07-05', 0, '#ski', 0, None]

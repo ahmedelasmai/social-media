@@ -1,10 +1,12 @@
-from flask import render_template, redirect, url_for, request
+from flask import render_template, redirect, url_for, request, jsonify
 from app import app
 from app.videos import Videos
 from app.db import Db
 
 video = Videos()
 db = Db()
+
+
 
 @app.route('/')      
 @app.route('/index', methods = ['GET', 'POST'])
@@ -34,18 +36,27 @@ def index():
     feed, hashtags = db.posts()                    
     return render_template('index.html',feed=feed,hashtags=hashtags)
 
+@app.route('/likes', methods=['POST'])
+def likes():
+    if request.method == 'POST':
+        post_id = request.json['post_id']
+    db.like(post_id)
+    return ''
+
+
+@app.route('/message', methods = ['GET', 'POST'])
+def message():
+    return render_template('message.html')
+
 @app.route('/post', methods = ['GET', 'POST'])
 def post():
     if request.method == 'POST':
         tweet = request.form.get('tweet')
         img_file = request.files.get('file')
-        print(img_file)
         successful = db.upload(tweet=tweet, image_file=img_file)
 
         if successful:
             return redirect(url_for('profile'))
-    
-    print('failed')
     return render_template('post.html')
 
 @app.route('/profile')
