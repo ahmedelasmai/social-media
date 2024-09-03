@@ -71,3 +71,6 @@ class Videos:
             print('error', response.status_code) 
 
         return links
+    
+
+video = Videos()

@@ -1,16 +1,46 @@
 from flask import render_template, redirect, url_for, request, jsonify
-from app import app
-from app.videos import Videos
-from app.db import Db
+from flask_socketio import join_room, leave_room, send, SocketIO
+from flask_login import login_user, logout_user, login_required, current_user
+from app import app, socketio
+from app.videos import video
+from app.db import db
+from app.user import User
 
-video = Videos()
-db = Db()
 
 
+
+
+# @socketio.on('join')
+# def handle_join():
+#     can_message_tuple = db.can_message()
+    
+#     for room_name in can_message_tuple:
+#         join_room
+    
+
+@app.route('/login', methods = ['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        user = User.auth(username, password)
+        if user:
+            login_user(user,remember=True)
+            db.user_var_setup(current_user.get_id()) 
+            return redirect(url_for("index"))
+    return render_template('login.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
 
 @app.route('/')      
 @app.route('/index', methods = ['GET', 'POST'])
+@login_required
 def index():
+    a = current_user.get_id()
     if request.method == 'POST':
         search = request.form['search']
         if search[0] == '#':
@@ -37,6 +67,7 @@ def index():
     return render_template('index.html',feed=feed,hashtags=hashtags)
 
 @app.route('/likes', methods=['POST'])
+@login_required
 def likes():
     if request.method == 'POST':
         post_id = request.json['post_id']
@@ -45,10 +76,12 @@ def likes():
 
 
 @app.route('/message', methods = ['GET', 'POST'])
+@login_required
 def message():
     return render_template('message.html')
 
 @app.route('/post', methods = ['GET', 'POST'])
+@login_required
 def post():
     if request.method == 'POST':
         tweet = request.form.get('tweet')
@@ -60,6 +93,7 @@ def post():
     return render_template('post.html')
 
 @app.route('/profile')
+@login_required
 def profile():
     user_info,followers, following, feed,hashtags = db.load_profile()  
     username, name , bio = user_info[:3]
@@ -68,6 +102,7 @@ def profile():
                            ,bio=bio, followers=followers,following=following,feed=feed,hashtags=hashtags)
 
 @app.route('/followers', methods = ['GET', 'POST'])
+@login_required
 def followers():
     #when press follow button
     if request.method == 'POST':
@@ -85,6 +120,7 @@ def followers():
     return render_template('followers.html',followers_list=followers_list, mutual=mutual)
 
 @app.route('/following', methods = ['GET', 'POST'])
+@login_required
 def following():
     #when press follow button
     if request.method == 'POST':
@@ -102,6 +138,7 @@ def following():
 
 
 @app.route('/video', methods = ['GET', 'POST'])
+@login_required
 def videos():
 
     if request.method == 'POST':           

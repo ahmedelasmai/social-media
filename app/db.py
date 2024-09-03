@@ -4,16 +4,23 @@ import os
 from . import ALLOWED_EXTENSIONS, UPLOAD_FOLDER
 from werkzeug.utils import secure_filename
 
-class Db:
 
-    def __init__(self):            #debug     
-        self.username = '@user2'   #profile
-        self.user = '@user1'       #logged in as 
+class Db():
+
+    # def __init__(self):            #debug     
+    #     self.username = '@user2'   #profile
+    #     self.user = '@user1'       #logged in as 
+    #     ###
         
-    #                                     DEBUG
-    def loggedin(self):
-        self.user = '@user1' 
-    
+
+    # #                                     DEBUG
+
+    # def loggedin(self):
+    #     self.user = '@user1' 
+
+    def user_var_setup(self,user):
+        self.user = str(user)
+
     def like(self, post_id):
         with sqlite3.connect('social media.db') as conn:
             cursor = conn.cursor()
@@ -60,14 +67,14 @@ class Db:
     def load_profile(self):
         with sqlite3.connect('social media.db') as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT Username, Name, Bio FROM User WHERE Username=?", (self.username,))
+            cursor.execute("SELECT Username, Name, Bio FROM User WHERE Username=?", (self.user,))
             user_info = cursor.fetchone()  #tuple
-            cursor.execute("SELECT COUNT(stalker) FROM Follows WHERE target=?", (self.username,))
+            cursor.execute("SELECT COUNT(stalker) FROM Follows WHERE target=?", (self.user,))
             followers = cursor.fetchall()
-            cursor.execute("SELECT COUNT(target) FROM Follows WHERE stalker=?", (self.username,))
+            cursor.execute("SELECT COUNT(target) FROM Follows WHERE stalker=?", (self.user,))
             follows = cursor.fetchall()
         
-        posts, sidebar_hashtags = self.posts(self.username)
+        posts, sidebar_hashtags = self.posts(self.user)
 
         return user_info[:3], followers[0][0], follows[0][0],posts, sidebar_hashtags
     
@@ -77,7 +84,7 @@ class Db:
             cursor.execute("""SELECT follows.stalker, User.Name, User.bio  
                            FROM follows
                            LEFT JOIN User ON follows.stalker = User.Username
-                           WHERE target=?""", (self.username,))
+                           WHERE target=?""", (self.user,))
             follower = cursor.fetchall()   
             
         mutual = self.user_already_following(follower)
@@ -90,7 +97,7 @@ class Db:
             cursor.execute("""SELECT follows.target, User.Name, User.bio  
                            FROM follows
                            LEFT JOIN User ON follows.target = User.Username
-                           WHERE stalker=?""", (self.username,))
+                           WHERE stalker=?""", (self.user,))
             following = cursor.fetchall()   
             
         mutual = self.user_already_following(following)
@@ -181,7 +188,7 @@ LEFT JOIN
         if user is None:
             return False
         else:
-            self.username = user[0]
+            self.user = user[0]
             return True
     
     def hashtag_exists(self, search):
@@ -236,7 +243,7 @@ LEFT JOIN
         else:
             return False
 
-# db = Db()
+db = Db()
 # db.posts()
 # post ,h= db.posts()
 # print(post)
