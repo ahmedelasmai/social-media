@@ -29,6 +29,7 @@ social media website based on twitter
   venv\Scripts\activate
   ```
 4. pip install requirements.txt
+   
 5. to run the app type:
 ```bash
 flask run
