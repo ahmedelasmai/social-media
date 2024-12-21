@@ -30,11 +30,13 @@ social media website based on twitter
   ```
 4. pip install requirements.txt
    
-5. to run the app type:
+5. to run the app type: 
 ```bash
 flask run
 ```
 6. to log in use
    - username: @user1
    - password: password1
+
+
     
